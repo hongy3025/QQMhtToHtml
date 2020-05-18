@@ -2,10 +2,10 @@ using System;
 using System.IO;
 using System.Text;
 using System.Collections.Generic;
- 
+
 /// <summary>
 /// HTMLParser is an object that can decode mhtml into ASCII text.
-/// Using getHTMLText() will generate static HTML with inline images. 
+/// Using getHTMLText() will generate static HTML with inline images.
 /// </summary>
 public class MHTMLParser
 {
@@ -15,11 +15,11 @@ public class MHTMLParser
     const string CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";
     const string CONTENT_LOCATION = "Content-Location";
     const string FILE_NAME = "filename=";
- 
+
     private string mhtmlString; // the string we want to decode
     private string log; // log file
     public bool decodeImageData; //decode images?
- 
+
     /*
      * Results of Conversion
      * This is split into a string[3] for each part
@@ -28,7 +28,7 @@ public class MHTMLParser
      * string[2] is the converted data
      */
     public List<string[]> dataset;
- 
+
     /*
      * Default Constructor
      */
@@ -38,9 +38,9 @@ public class MHTMLParser
         log += "Initialized dataset.\n";
         decodeImageData = false; //Set default for decoding images
     }
- 
+
     /*
-     * Init with contents of string 
+     * Init with contents of string
      */
     public MHTMLParser(string mhtml)
         : this()
@@ -85,16 +85,16 @@ public class MHTMLParser
         string charset = "utf-8";
         StringBuilder buffer = null;
         log += "Starting decompression \n";
- 
- 
+
+
         try
         {
             reader = new StringReader(mhtmlString); //Start reading the string
- 
+
             string boundary = GetBoundary(reader); // Get the boundary code
             if (boundary == null) throw new Exception("Failed to find string 'boundary'");
             log += "Found boundary.\n";
- 
+
             //Loop through each line in the string
             string line = null;
             while ((line = reader.ReadLine()) != null)
@@ -106,7 +106,7 @@ public class MHTMLParser
                     {
                         string[] data = new string[3];
                         data[0] = type;
-                        data[1] = filename!=""?filename:location;
+                        data[1] = filename != "" ? filename : location;
                         data[2] = WriteBufferContent(buffer, encoding, charset, type, decodeImageData);
                         dataset.Add(data);
                         buffer = null;
@@ -163,7 +163,7 @@ public class MHTMLParser
     private string WriteBufferContent(StringBuilder buffer, string encoding, string charset, string type, bool decodeImages)
     {
         log += "Start writing buffer contents.\n";
- 
+
         //Detect if this is an image and if we want to decode it
         if (type.Contains("image"))
         {
@@ -174,7 +174,7 @@ public class MHTMLParser
                 return buffer.ToString();
             }
         }
- 
+
         // base64 Decoding
         if (encoding.ToLower().Equals("base64"))
         {
@@ -238,7 +238,7 @@ public class MHTMLParser
     private string GetBoundary(StringReader reader)
     {
         string line = null;
- 
+
         while ((line = reader.ReadLine()) != null)
         {
             line = line.Trim();
@@ -254,7 +254,7 @@ public class MHTMLParser
         return null;
     }
     /*
-     * Grabs charset from a line 
+     * Grabs charset from a line
      */
     private string GetCharSet(string temp)
     {
@@ -278,7 +278,7 @@ public class MHTMLParser
         List<string[]> data = DecompressString();
         string body = "";
         //First, lets write all non-images to mail body
-        //Then go back and add images in 
+        //Then go back and add images in
         for (int i = 0; i < 2; i++)
         {
             foreach (string[] strArray in data)
